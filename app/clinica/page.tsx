@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import StatCard from "../componentes/StatCard";
-import DataTable from "../componentes/DataTable";
-import PriorityBadge from "../componentes/PriorityBadge";
+import StatCard from "../components/StatCard";
+import DataTable from "../components/DataTable";
+import PriorityBadge from "../components/PriorityBadge";
 
 interface Solicitud {
   id: number;

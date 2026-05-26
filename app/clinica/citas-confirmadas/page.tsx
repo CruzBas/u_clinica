@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import DataTable from "../../componentes/DataTable";
-import Modal from "../../componentes/Modal";
-import MaterialIcon from "../../componentes/MaterialIcon";
+import DataTable from "../../components/DataTable";
+import Modal from "../../components/Modal";
+import MaterialIcon from "../../components/MaterialIcon";
 
 interface Cita {
   id: string;

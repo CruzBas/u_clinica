@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import MaterialIcon from "../componentes/MaterialIcon";
-import PriorityBadge from "../componentes/PriorityBadge";
+import MaterialIcon from "../components/MaterialIcon";
+import PriorityBadge from "../components/PriorityBadge";
 
 interface Registro {
   id: number;

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import DataTable from "../../componentes/DataTable";
-import PriorityBadge from "../../componentes/PriorityBadge";
-import MaterialIcon from "../../componentes/MaterialIcon";
+import DataTable from "../../components/DataTable";
+import PriorityBadge from "../../components/PriorityBadge";
+import MaterialIcon from "../../components/MaterialIcon";
 
 interface Practicante {
   id: number;
@@ -225,11 +225,10 @@ export default function PracticantesPage() {
                       setDeptFilter(d);
                       setIsDeptDropdownOpen(false);
                     }}
-                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                      deptFilter === d
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${deptFilter === d
                         ? "bg-primary text-white"
                         : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     {d === "Todos" ? "Todos los Departamentos" : d}
                   </button>
@@ -258,11 +257,10 @@ export default function PracticantesPage() {
                       setStatusFilter(s);
                       setIsStatusDropdownOpen(false);
                     }}
-                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                      statusFilter === s
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${statusFilter === s
                         ? "bg-primary text-white"
                         : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     {s === "Todos" ? "Todos los Estados" : s}
                   </button>

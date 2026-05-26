@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import MaterialIcon from "./componentes/MaterialIcon";
+import MaterialIcon from "./components/MaterialIcon";
 
 export default function Home() {
   const router = useRouter();

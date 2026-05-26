@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import DataTable from "../../componentes/DataTable";
-import PriorityBadge from "../../componentes/PriorityBadge";
-import MaterialIcon from "../../componentes/MaterialIcon";
+import DataTable from "../../components/DataTable";
+import PriorityBadge from "../../components/PriorityBadge";
+import MaterialIcon from "../../components/MaterialIcon";
 
 interface Cliente {
   id: number;

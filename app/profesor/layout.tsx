@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
-import Header from "../componentes/Header";
-import Sidebar from "../componentes/Sidebar";
-import SidebarOverlay from "../componentes/SidebarOverlay";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import SidebarOverlay from "../components/SidebarOverlay";
 
 export default function ProfesorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

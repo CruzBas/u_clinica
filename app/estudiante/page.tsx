@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import MaterialIcon from "../componentes/MaterialIcon";
-import Modal from "../componentes/Modal";
+import MaterialIcon from "../components/MaterialIcon";
+import Modal from "../components/Modal";
 
 interface PacienteAsignado {
   id: number;
@@ -205,14 +205,12 @@ export default function EstudianteDashboard() {
                   return (
                     <div
                       key={dia.key}
-                      className={`sticky top-0 bg-white dark:bg-slate-900 z-20 border-b border-slate-200 dark:border-slate-800 py-3 text-center ${
-                        esHoy ? "bg-clinical-blue/5" : ""
-                      }`}
+                      className={`sticky top-0 bg-white dark:bg-slate-900 z-20 border-b border-slate-200 dark:border-slate-800 py-3 text-center ${esHoy ? "bg-clinical-blue/5" : ""
+                        }`}
                     >
                       <span
-                        className={`block text-[10px] font-black uppercase ${
-                          esHoy ? "text-clinical-blue" : "text-slate-400"
-                        }`}
+                        className={`block text-[10px] font-black uppercase ${esHoy ? "text-clinical-blue" : "text-slate-400"
+                          }`}
                       >
                         {dia.label}
                       </span>
