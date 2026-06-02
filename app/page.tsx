@@ -21,10 +21,11 @@ export default function Home() {
     } else if (cleanEmail === "practicante@clinica.com") {
       router.push("/estudiante");
     } else {
-      alert("Usuario no reconocido. Use profesor@clinica.com, admin@clinica.com o practicante@clinica.com");
+      alert(
+        "Usuario no reconocido. Use profesor@clinica.com, admin@clinica.com o practicante@clinica.com",
+      );
     }
   };
-
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-xl shadow-xl overflow-hidden">
@@ -82,7 +83,10 @@ export default function Home() {
                 <label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
                   Contraseña
                 </label>
-                <a className="text-primary text-xs font-semibold hover:underline" href="#">
+                <a
+                  className="text-primary text-xs font-semibold hover:underline"
+                  href="#"
+                >
                   ¿Olvidaste tu contraseña?
                 </a>
               </div>
@@ -114,7 +118,10 @@ export default function Home() {
           <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
             <p className="text-slate-600 dark:text-slate-400 text-sm">
               ¿Aún no tienes una cuenta?
-              <Link href="/registro" className="text-primary font-bold hover:underline ml-1">
+              <Link
+                href="/registro"
+                className="text-primary font-bold hover:underline ml-1"
+              >
                 Regístrate aquí
               </Link>
             </p>
