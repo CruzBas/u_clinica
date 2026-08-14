@@ -132,16 +132,10 @@ export default function ClinicaDashboard() {
             key={sol.id}
             className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
           >
-            <td className="px-6 py-4 whitespace-nowrap font-medium">{sol.nombre}</td>
-            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
-              {sol.servicio}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
-              {sol.fecha}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-bold">
-              {sol.hora}
-            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-slate-800 font-bold">{sol.nombre}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">{sol.servicio}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">{sol.fecha}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-bold">{sol.hora}</td>
             <td className="px-6 py-4 whitespace-nowrap">
               <PriorityBadge label={sol.prioridad} />
             </td>
