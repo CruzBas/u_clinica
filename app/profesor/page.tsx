@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import MaterialIcon from "../components/MaterialIcon";
 import PriorityBadge from "../components/PriorityBadge";
+import Modal from "../components/Modal";
 
 interface Registro {
   id: number;
@@ -49,12 +50,47 @@ const initialRegistros: Registro[] = [
   },
 ];
 
-export default function ProfesorDashboard() {
-  const [registros, setRegistros] = useState<Registro[]>(initialRegistros);
+const materias = [
+  "Anatomia",
+  "Bioquimica",
+  "Farmacologia",
+  "Fisiologia",
+  "Practica Clinica",
+];
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.origin + "/registro");
+const cuatrimestres = ["I", "II", "III"];
+
+export default function ProfesorDashboard() {
+  const [registros] = useState<Registro[]>(initialRegistros);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [materia, setMateria] = useState(materias[0]);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, index) => currentYear + index);
+  const [cuatrimestre, setCuatrimestre] = useState(cuatrimestres[0]);
+  const [anio, setAnio] = useState(String(currentYear));
+  const [fechaVencimiento, setFechaVencimiento] = useState("");
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+
+  };
+   const handleCreateLink = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCopyLink = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const params = new URLSearchParams({
+      materia,
+      cuatrimestre,
+      anio,
+      vence: fechaVencimiento,
+    });
+
+    navigator.clipboard.writeText(`${window.location.origin}/registro?${params.toString()}`);
     alert("¡Enlace de registro copiado al portapapeles!");
+    handleCloseModal();
   };
 
   return (
@@ -71,11 +107,11 @@ export default function ProfesorDashboard() {
 
         <div>
           <button
-            onClick={handleCopyLink}
+            onClick={handleCreateLink}
             className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all cursor-pointer"
           >
             <MaterialIcon name="link" className="text-lg" />
-            Copiar Enlace de Registro
+            Crear Enlace de Registro
           </button>
         </div>
       </div>
@@ -153,6 +189,103 @@ export default function ProfesorDashboard() {
           </table>
         </div>
       </div>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <form onSubmit={handleCopyLink} className="flex flex-col gap-5">
+          <div className="text-center">
+          <div className="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MaterialIcon name="link" className="text-4xl" />
+          </div>
+          <h4 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">
+            Crear enlace de registro
+          </h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Seleccione la informacion que tendra el formulario de registro.
+          </p>
+          </div>
+
+          <div className="flex flex-col gap-4 text-left">
+            <label className="flex flex-col gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+              Materia
+              <select
+                value={materia}
+                onChange={(event) => setMateria(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                required
+              >
+                {materias.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex flex-col gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                Cuatrimestre
+                <select
+                  value={cuatrimestre}
+                  onChange={(event) => setCuatrimestre(event.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                  required
+                >
+                  {cuatrimestres.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                Año
+                <select
+                  value={anio}
+                  onChange={(event) => setAnio(event.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                  required
+                >
+                  {years.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="flex flex-col gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+              Fecha de vencimiento
+              <input
+                type="date"
+                value={fechaVencimiento}
+                onChange={(event) => setFechaVencimiento(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                required
+              />
+            </label>
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg transition-all hover:opacity-90 dark:bg-slate-100 dark:text-slate-900 cursor-pointer"
+           onClick={handleCopyLink}
+          >
+            <MaterialIcon name="content_copy" className="text-lg" />
+            Copiar Enlace
+          </button>
+          </div>
+        </form>
+      </Modal>
     </>
   );
 }
