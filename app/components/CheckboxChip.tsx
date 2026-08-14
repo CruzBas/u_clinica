@@ -5,6 +5,7 @@ type Props = {
     id: string;
     label: string;
     value: string;
+    name?: string;
     checked?: boolean;
 };
 
@@ -12,23 +13,34 @@ export default function CheckboxChip({
     id,
     label,
     value,
+    name,
     checked,
 }: Props) {
-    const [icon, setIcon] = useState("add");
-    const handleIcon = () => {
-        if (icon === "add") {
-            setIcon("close");
-        } else {
-            setIcon("add");
+    const [isChecked, setIsChecked] = useState(checked ?? false);
+    const handleIcon = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (name === "motivos" && event.target.checked) {
+            const checkedOptions = event.currentTarget.form?.querySelectorAll(
+                'input[name="motivos"]:checked',
+            );
+
+            if ((checkedOptions?.length ?? 0) > 3) {
+                event.target.checked = false;
+                setIsChecked(false);
+                return;
+            }
         }
+
+        setIsChecked(event.target.checked);
     };
     return (
         <div className="relative">
             <input
-                onClick={handleIcon}
+                onChange={handleIcon}
                 type="checkbox"
                 id={id}
+                name={name}
                 value={value}
+                defaultChecked={checked}
                 className="peer hidden"
             />
 
@@ -40,7 +52,7 @@ export default function CheckboxChip({
                 </span>
 
                 <MaterialIcon
-                    name={icon}
+                    name={isChecked ? "close" : "add"}
                     className="text-lg"
                 />
             </label>
