@@ -95,13 +95,23 @@ const Estudiantes: Registro[] = [
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>(initialClientes);
+
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
   const [search, setSearch] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
+
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+
   const [isStudentSelectOpen, setIsStudentSelectOpen] = useState(false);
+
   const [clienteToDelete, setClienteToDelete] = useState<Cliente | null>(null);
+
   const[clienteToSee, setClienteTosee] = useState<Cliente | null>(null);
+
+  const[ModalConfirmOpen,setModalConfirmOpen]= useState(false);
+  const[ModalMassage, setModalMassage] = useState("");
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -126,12 +136,13 @@ export default function ClientesPage() {
       return;
     }
 
-    alert(
+    setModalMassage(
       `Se han enviado ${selectedIds.length} registro(s) a ${selectedStudentIds.length} estudiante(s).`
     );
     setSelectedIds([]);
     setSelectedStudentIds([]);
     setIsStudentSelectOpen(false);
+    setModalConfirmOpen(true);
   };
 
   const clearSelection = () => {
@@ -148,8 +159,8 @@ export default function ClientesPage() {
     setClienteToDelete(null);
   };
   const handleCloseModal = () => {
-    setClienteTosee();
-    
+    setClienteTosee(null);
+    setModalConfirmOpen(false);
   };
 
   const filtered = clientes.filter(
@@ -422,23 +433,95 @@ export default function ClientesPage() {
       </section>
     </div>
     <Modal isOpen={clienteToSee != null} onClose={handleCloseModal}>
-            <div className="text-center">
-              <div className="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <MaterialIcon name="person" className="text-4xl" />
-              </div>
-              <h4 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">Informacion Paciente</h4>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Nombre del paciente: {clienteToSee?.nombre}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Nombre del paciente: {clienteToSee?.telefono}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Nombre del paciente: {clienteToSee?.servicio}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Nombre del paciente: {clienteToSee?.prioridad}</p>
-              <button
-                onClick={handleCloseModal}
-                className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-bold py-3.5 rounded-2xl hover:opacity-90 transition-all shadow-lg cursor-pointer"
-              >
-                Salir
-              </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={handleCloseModal}
+          className="absolute right-0 top-0 flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-slate-200 cursor-pointer"
+          aria-label="Cerrar modal"
+        >
+          <MaterialIcon name="close" className="text-xl" />
+        </button>
+
+        <div className="pr-10">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">
+            Expediente del paciente
+          </p>
+          <h4 className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">
+            Informacion del paciente
+          </h4>
+          <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+            Resumen de datos principales para revision y asignacion clinica.
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex items-center gap-4">
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-white text-2xl font-black text-primary shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800">
+              {clienteToSee?.nombre.charAt(0).toUpperCase()}
             </div>
-          </Modal>
+            <div className="min-w-0">
+              <h5 className="truncate text-lg font-black text-slate-900 dark:text-slate-100">
+                {clienteToSee?.nombre}
+              </h5>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <PriorityBadge label={clienteToSee?.prioridad ?? ""} />
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-500 shadow-sm dark:bg-slate-950 dark:text-slate-400">
+                  Ingreso: {clienteToSee?.fechaIngreso}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          <div className="flex items-start gap-3 rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-800">
+            <MaterialIcon name="call" className="mt-0.5 text-xl text-primary" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                Telefono
+              </p>
+              <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">
+                {clienteToSee?.telefono}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-800">
+            <MaterialIcon name="medical_services" className="mt-0.5 text-xl text-primary" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                Servicio solicitado
+              </p>
+              <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">
+                {clienteToSee?.servicio}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-800">
+            <MaterialIcon name="event_available" className="mt-0.5 text-xl text-primary" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                Fecha de ingreso
+              </p>
+              <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">
+                {clienteToSee?.fechaIngreso}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleCloseModal}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white cursor-pointer"
+        >
+          <MaterialIcon name="check" className="text-lg" />
+          Entendido
+        </button>
+      </div>
+    </Modal>
 
     <Modal isOpen={clienteToDelete !== null} onClose={() => setClienteToDelete(null)}>
       <div className="relative flex flex-col gap-6">
@@ -517,6 +600,23 @@ export default function ClientesPage() {
         </div>
       </div>
     </Modal>
+    <Modal isOpen={ModalConfirmOpen} onClose={handleCloseModal}>
+            <div className="text-center">
+              <div className="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MaterialIcon name="check_circle" className="text-4xl" />
+              </div>
+              <h4 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">
+                ¡Operación Exitosa!
+              </h4>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">{ModalMassage}</p>
+              <button
+                onClick={handleCloseModal}
+                className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-bold py-3.5 rounded-2xl hover:opacity-90 transition-all shadow-lg cursor-pointer"
+              >
+                Entendido
+              </button>
+            </div>
+          </Modal>
     </>
   );
 }
