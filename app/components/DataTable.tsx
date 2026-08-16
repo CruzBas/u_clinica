@@ -39,7 +39,7 @@ export default function DataTable({
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
       {(title || onSearchChange || headerActions) && (
         <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          {title && <h3 className="text-lg font-bold">{title}</h3>}
+          {title && <h3 className="text-lg font-bold text-black">{title}</h3>}
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             {headerActions}
             {onSearchChange && (

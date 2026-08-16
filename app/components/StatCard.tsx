@@ -42,7 +42,7 @@ export default function StatCard({
       </div>
       <div>
         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{label}</p>
-        <p className="text-2xl sm:text-3xl font-bold mt-1">{value}</p>
+        <p className="text-2xl text-black sm:text-3xl font-bold mt-1">{value}</p>
       </div>
     </div>
   );
