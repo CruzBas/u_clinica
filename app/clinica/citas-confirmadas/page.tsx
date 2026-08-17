@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import DataTable from "../../components/DataTable";
 import Modal from "../../components/Modal";
 import MaterialIcon from "../../components/MaterialIcon";
+import PriorityBadge from "@/app/components/PriorityBadge";
 
 interface Cita {
   id: string;
@@ -13,6 +14,7 @@ interface Cita {
   fecha: string;
   hora: string;
   estado: string;
+  prioridad: string;
 }
 
 const initialCitas: Cita[] = [
@@ -24,6 +26,7 @@ const initialCitas: Cita[] = [
     fecha: "2026-02-26",
     hora: "08:30 AM",
     estado: "Confirmada",
+    prioridad: "Alta"
   },
   {
     id: "#CT-8905",
@@ -33,6 +36,7 @@ const initialCitas: Cita[] = [
     fecha: "2026-02-26",
     hora: "10:45 AM",
     estado: "Confirmada",
+    prioridad: "Media"
   },
   {
     id: "#CT-8912",
@@ -42,6 +46,7 @@ const initialCitas: Cita[] = [
     fecha: "2026-02-27",
     hora: "02:15 PM",
     estado: "Confirmada",
+    prioridad: "Baja"
   },
 ];
 
@@ -51,12 +56,14 @@ export default function CitasConfirmadas() {
   const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [search, setSearch] = useState("");
+   const[citaToSee, setcitaToSee] = useState<Cita | null>(null);
 
   const [filteredCitas, setFilteredCitas] = useState<Cita[]>(initialCitas);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
   const handleFilter = () => {
     let result = citas;
@@ -114,6 +121,7 @@ export default function CitasConfirmadas() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setcitaToSee(null);
     clearSelection();
   };
 
@@ -144,7 +152,7 @@ export default function CitasConfirmadas() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Citas Confirmadas</h2>
+        <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">Citas Confirmadas</h2>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
           Listado de todas las citas agendadas y confirmadas.
         </p>
@@ -239,7 +247,7 @@ export default function CitasConfirmadas() {
           </div>
           <button
             onClick={handleFilter}
-            className="w-full lg:w-auto bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-8 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition-all cursor-pointer animate-pulse"
+            className="w-full lg:w-auto bg-primary dark:bg-slate-100 text-white dark:text-slate-900 px-8 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition-all cursor-pointe"
           >
             Filtrar
           </button>
@@ -268,14 +276,14 @@ export default function CitasConfirmadas() {
                 className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary/20 bg-white dark:bg-slate-800 cursor-pointer"
               />
             </td>
-            <td className="px-6 py-4 font-mono text-xs font-bold text-slate-400">{cita.id}</td>
+            <td className="px-6 py-4 font-mono text-xs font-bold text-slate-900">{cita.id}</td>
             <td className="px-6 py-4">
               <div className="flex flex-col">
-                <span className="text-sm font-bold">{cita.paciente}</span>
+                <span className="text-sm font-bold text-slate-900">{cita.paciente}</span>
                 <span className="text-[11px] text-slate-400">ID: {cita.pacienteId}</span>
               </div>
             </td>
-            <td className="px-6 py-4 text-sm font-medium">{cita.servicio}</td>
+            <td className="px-6 py-4 text-sm font-medium text-slate-900">{cita.servicio}</td>
             <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{cita.fecha}</td>
             <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{cita.hora}</td>
             <td className="px-6 py-4">
@@ -286,7 +294,7 @@ export default function CitasConfirmadas() {
             </td>
             <td className="px-6 py-4 text-center">
               <button
-                onClick={() => alert(`Visualizando detalles de la cita: ${cita.id}`)}
+                onClick={() => setcitaToSee(cita)}
                 className="p-2 text-slate-400 hover:text-primary transition-colors cursor-pointer"
               >
                 <MaterialIcon name="visibility" className="text-xl" />
@@ -313,6 +321,82 @@ export default function CitasConfirmadas() {
           </button>
         </div>
       </Modal>
+
+      <Modal isOpen={citaToSee != null} onClose={handleCloseModal}>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="absolute right-0 top-0 flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-slate-200 cursor-pointer"
+                aria-label="Cerrar modal"
+              >
+                <MaterialIcon name="close" className="text-xl" />
+              </button>
+      
+              <div className="pr-10">
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                  Cita: {citaToSee?.id}
+                </p>
+                <h4 className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">
+                  Informacion del la cita
+                </h4>
+                <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                  Resumen de datos principales.
+                </p>
+              </div>
+      
+              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                <div className="flex items-center gap-4">
+                  <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-white text-2xl font-black text-primary shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800">
+                    {citaToSee?.paciente.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <h5 className="truncate text-lg font-black text-slate-900 dark:text-slate-100">
+                      {citaToSee?.paciente}
+                    </h5>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <PriorityBadge label={citaToSee?.prioridad ?? ""} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
+              <div className="mt-5 grid gap-3">
+                <div className="flex items-start gap-3 rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-800">
+                  <MaterialIcon name="medical_services" className="mt-0.5 text-xl text-primary" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      Servicio solicitado
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">
+                      {citaToSee?.servicio}
+                    </p>
+                  </div>
+                </div>
+      
+                <div className="flex items-start gap-3 rounded-lg border border-slate-200 px-4 py-3 dark:border-slate-800">
+                  <MaterialIcon name="event_available" className="mt-0.5 text-xl text-primary" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      Fecha de la cita
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">
+                      {citaToSee?.fecha}
+                    </p>
+                  </div>
+                </div>
+              </div>
+      
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white cursor-pointer"
+              >
+                <MaterialIcon name="check" className="text-lg" />
+                Entendido
+              </button>
+            </div>
+          </Modal>
     </>
   );
 }

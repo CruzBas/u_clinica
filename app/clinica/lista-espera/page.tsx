@@ -119,7 +119,7 @@ export default function ListaEspera() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Lista de Espera</h2>
+        <h2 className="text-2xl sm:text-3xl text-black font-black tracking-tight">Lista de Espera</h2>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
           Selecciona pacientes para compartir sus expedientes con los profesores encargados.
         </p>
@@ -141,7 +141,7 @@ export default function ListaEspera() {
                   onClick={() => setIsProfDropdownOpen(!isProfDropdownOpen)}
                   className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-primary/20 rounded-lg text-sm flex items-center justify-between font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  <span className={selectedProfs.length > 0 ? "text-primary font-bold" : ""}>
+                  <span className={selectedProfs.length > 0 ? "text-slate font-bold" : ""}>
                     {getDropdownText()}
                   </span>
                   <MaterialIcon
@@ -225,7 +225,7 @@ export default function ListaEspera() {
                 className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary bg-transparent cursor-pointer"
               />
             </td>
-            <td className="px-6 py-4 whitespace-nowrap font-medium">{paciente.nombre}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-slate-900">{paciente.nombre}</td>
             <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
               {paciente.servicio}
             </td>

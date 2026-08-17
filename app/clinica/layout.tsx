@@ -14,6 +14,7 @@ export default function ClinicaLayout({ children }: { children: React.ReactNode 
     { href: "/clinica", label: "Tablero", icon: "dashboard" },
     { href: "/clinica/lista-espera", label: "Lista de espera", icon: "group" },
     { href: "/clinica/citas-confirmadas", label: "Citas Confirmadas", icon: "event_available" },
+    { href: "/clinica/consultorios", label:"Consultorios",icon: "meeting_room"}
   ];
 
   return (
