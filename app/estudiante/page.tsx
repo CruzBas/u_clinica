@@ -14,9 +14,11 @@ interface PacienteAsignado {
 }
 
 interface Booking {
+  id: number;
   time: string;
   dayIndex: number;
   consultorio: string;
+  owner: "me" | "other";
 }
 
 const initialPacientes: PacienteAsignado[] = [
@@ -62,23 +64,28 @@ const horasSemana = [
 ];
 
 const fixedOccupied: Booking[] = [
-  { time: "08:00 AM", dayIndex: 1, consultorio: "Cons. 1" },
-  { time: "09:00 AM", dayIndex: 0, consultorio: "Cons. 2" },
-  { time: "10:00 AM", dayIndex: 2, consultorio: "Cons. 3" },
-  { time: "11:00 AM", dayIndex: 4, consultorio: "Cons. 1" },
-  { time: "02:00 PM", dayIndex: 1, consultorio: "Cons. 2" },
-  { time: "02:00 PM", dayIndex: 3, consultorio: "Cons. 3" },
-  { time: "04:00 PM", dayIndex: 0, consultorio: "Cons. 1" },
-  { time: "04:00 PM", dayIndex: 2, consultorio: "Cons. 2" },
+  { id: 1, time: "08:00 AM", dayIndex: 1, consultorio: "Cons. 1", owner: "other" },
+  { id: 2, time: "09:00 AM", dayIndex: 0, consultorio: "Cons. 2", owner: "other" },
+  { id: 3, time: "10:00 AM", dayIndex: 2, consultorio: "Cons. 3", owner: "other" },
+  { id: 4, time: "11:00 AM", dayIndex: 4, consultorio: "Cons. 1", owner: "other" },
+  { id: 5, time: "02:00 PM", dayIndex: 1, consultorio: "Cons. 2", owner: "other" },
+  { id: 6, time: "02:00 PM", dayIndex: 3, consultorio: "Cons. 3", owner: "other" },
+  { id: 7, time: "04:00 PM", dayIndex: 0, consultorio: "Cons. 1", owner: "other" },
+  { id: 8, time: "04:00 PM", dayIndex: 2, consultorio: "Cons. 2", owner: "other" },
 ];
 
 export default function EstudianteDashboard() {
   const [activePaciente, setActivePaciente] = useState<PacienteAsignado | null>(null);
   const [selectedBookingCell, setSelectedBookingCell] = useState<{ dayLabel: string; dayIndex: number; hour: string } | null>(null);
+  const [selectedManagedBooking, setSelectedManagedBooking] = useState<Booking | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isManageBookingModalOpen, setIsManageBookingModalOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>(fixedOccupied);
+  const [isModalConfirm, setisModalConfirm] = useState(false);
   const [selectedConsultorio, setSelectedConsultorio] = useState("Consultorio #1");
+  const [feedbackMessage ,setfeedbackMessage]= useState("");
+  const [bookingMode, setBookingMode] = useState<"create" | "reschedule">("create");
 
   const openContact = (paciente: PacienteAsignado) => {
     setActivePaciente(paciente);
@@ -87,8 +94,16 @@ export default function EstudianteDashboard() {
 
   const handleCellClick = (dayLabel: string, dayIndex: number, hour: string) => {
     setSelectedBookingCell({ dayLabel, dayIndex, hour });
-    setSelectedConsultorio("Consultorio #1");
+    if (bookingMode === "create") {
+      setSelectedConsultorio("Consultorio #1");
+    }
     setIsBookingModalOpen(true);
+  };
+
+  const handleManageBooking = (booking: Booking) => {
+    if (booking.owner !== "me") return;
+    setSelectedManagedBooking(booking);
+    setIsManageBookingModalOpen(true);
   };
 
   const confirmBooking = () => {
@@ -96,15 +111,75 @@ export default function EstudianteDashboard() {
     const { hour, dayIndex } = selectedBookingCell;
 
     const newBooking: Booking = {
+      id: Date.now(),
       time: hour,
       dayIndex,
       consultorio: selectedConsultorio.replace("Consultorio #", "Cons. "),
+      owner: "me",
     };
 
     setBookings((prev) => [...prev, newBooking]);
     setIsBookingModalOpen(false);
     setSelectedBookingCell(null);
-    alert("¡Reserva confirmada!");
+    setisModalConfirm(true);
+    setfeedbackMessage("La reserva fue confirmada exitosamente. Ahora puede cancelarla o reagendarla desde el calendario.");
+  };
+
+  const cancelManagedBooking = () => {
+    if (!selectedManagedBooking) return;
+    setBookings((prev) => prev.filter((booking) => booking.id !== selectedManagedBooking.id));
+    setIsManageBookingModalOpen(false);
+    setSelectedManagedBooking(null);
+    setisModalConfirm(true);
+    setfeedbackMessage("La cita fue cancelada exitosamente.");
+  };
+
+  const startReschedule = () => {
+    if (!selectedManagedBooking) return;
+    setSelectedConsultorio(selectedManagedBooking.consultorio.replace("Cons. ", "Consultorio #"));
+    setBookingMode("reschedule");
+    setIsManageBookingModalOpen(false);
+    setIsBookingModalOpen(false);
+    setSelectedBookingCell(null);
+    setfeedbackMessage("Seleccione un nuevo espacio libre para reagendar su cita.");
+    setisModalConfirm(true);
+  };
+
+  const confirmReschedule = () => {
+    if (!selectedBookingCell || !selectedManagedBooking) return;
+    const { hour, dayIndex } = selectedBookingCell;
+
+    setBookings((prev) =>
+      prev.map((booking) =>
+        booking.id === selectedManagedBooking.id
+          ? {
+            ...booking,
+            time: hour,
+            dayIndex,
+            consultorio: selectedConsultorio.replace("Consultorio #", "Cons. "),
+          }
+          : booking
+      )
+    );
+    setIsBookingModalOpen(false);
+    setSelectedBookingCell(null);
+    setSelectedManagedBooking(null);
+    setBookingMode("create");
+    setisModalConfirm(true);
+    setfeedbackMessage("La cita fue reagendada exitosamente.");
+  };
+
+  const handleCloseModal = () => {
+    setisModalConfirm(false);
+  };
+
+  const handleBookingModalClose = () => {
+    setIsBookingModalOpen(false);
+    setSelectedBookingCell(null);
+    if (bookingMode === "reschedule") {
+      setBookingMode("create");
+      setSelectedManagedBooking(null);
+    }
   };
 
   return (
@@ -187,7 +262,11 @@ export default function EstudianteDashboard() {
                 <div className="flex gap-2 items-center text-[10px] font-bold uppercase text-slate-400">
                   <span className="flex items-center gap-1">
                     <span className="size-2 rounded-full bg-danger-red/30 border border-danger-red" />
-                    Ocupado
+                    Ocupado por otro
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="size-2 rounded-full bg-clinical-blue/30 border border-clinical-blue" />
+                    Mi cita
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="size-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700" />
@@ -252,14 +331,29 @@ export default function EstudianteDashboard() {
                       }
 
                       if (booking) {
+                        const isMine = booking.owner === "me";
+
                         return (
                           <div
                             key={i}
-                            className="border-b border-r border-slate-200 dark:border-slate-800 min-h-[80px] p-1 transition-colors relative"
+                            onClick={() => handleManageBooking(booking)}
+                            className={`border-b border-r border-slate-200 dark:border-slate-800 min-h-[80px] p-1 transition-colors relative ${isMine ? "cursor-pointer hover:bg-clinical-blue/5" : ""
+                              }`}
                           >
-                            <div className="rounded-md p-1 mb-1 text-[9px] font-semibold leading-tight flex flex-col gap-0.5 bg-danger-red/10 border-l-2 border-danger-red text-danger-red">
+                            <div
+                              className={`rounded-md p-1 mb-1 text-[9px] font-semibold leading-tight flex flex-col gap-0.5 border-l-2 ${isMine
+                                ? "bg-clinical-blue/10 border-clinical-blue text-clinical-blue"
+                                : "bg-danger-red/10 border-danger-red text-danger-red"
+                                }`}
+                            >
                               <span>{booking.consultorio}</span>
-                              <span className="opacity-60">Reservado</span>
+                              <span className="opacity-70">{isMine ? "Mi cita" : "Reservado"}</span>
+                              {isMine && (
+                                <span className="mt-1 inline-flex items-center gap-1 text-[8px] uppercase tracking-wide opacity-80">
+                                  <MaterialIcon name="edit_calendar" className="text-[10px]" />
+                                  Gestionar
+                                </span>
+                              )}
                             </div>
                           </div>
                         );
@@ -269,7 +363,8 @@ export default function EstudianteDashboard() {
                         <div
                           key={i}
                           onClick={() => handleCellClick(diasSemana[i].label + " " + diasSemana[i].num, i, hora)}
-                          className="border-b border-r border-slate-200 dark:border-slate-800 min-h-[80px] p-1 transition-colors relative hover:bg-slate-100/50 dark:hover:bg-slate-800/30 cursor-pointer"
+                          className={`border-b border-r border-slate-200 dark:border-slate-800 min-h-[80px] p-1 transition-colors relative hover:bg-slate-100/50 dark:hover:bg-slate-800/30 cursor-pointer ${bookingMode === "reschedule" ? "ring-1 ring-inset ring-clinical-blue/20" : ""
+                            }`}
                         />
                       );
                     })}
@@ -363,18 +458,19 @@ export default function EstudianteDashboard() {
         )}
       </Modal>
 
-      <Modal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)}>
+      <Modal isOpen={isBookingModalOpen} onClose={handleBookingModalClose}>
         {selectedBookingCell && (
           <div className="relative">
             <button
-              onClick={() => setIsBookingModalOpen(false)}
+              onClick={handleBookingModalClose}
               className="absolute right-0 top-0 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             >
               <MaterialIcon name="close" />
             </button>
             <div className="mb-6 mt-2">
               <h3 className="text-xl font-black text-clinical-blue flex items-center gap-2">
-                <MaterialIcon name="add_circle" /> Nueva Reserva
+                <MaterialIcon name={bookingMode === "reschedule" ? "edit_calendar" : "add_circle"} />
+                {bookingMode === "reschedule" ? "Reagendar Cita" : "Nueva Reserva"}
               </h3>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -411,22 +507,89 @@ export default function EstudianteDashboard() {
               </div>
               <div className="pt-4 flex gap-3">
                 <button
-                  onClick={() => setIsBookingModalOpen(false)}
+                  onClick={handleBookingModalClose}
                   className="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
-                  onClick={confirmBooking}
+                  onClick={bookingMode === "reschedule" ? confirmReschedule : confirmBooking}
                   className="flex-[2] py-3 bg-clinical-blue text-white rounded-xl text-sm font-bold shadow-lg shadow-clinical-blue/20 hover:bg-green-700 transition-all cursor-pointer"
                 >
-                  Confirmar Espacio
+                  {bookingMode === "reschedule" ? "Confirmar Cambio" : "Confirmar Espacio"}
                 </button>
               </div>
             </div>
           </div>
         )}
       </Modal>
+      <Modal isOpen={isManageBookingModalOpen} onClose={() => setIsManageBookingModalOpen(false)}>
+        {selectedManagedBooking && (
+          <div className="relative">
+            <button
+              onClick={() => setIsManageBookingModalOpen(false)}
+              className="absolute right-0 top-0 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              <MaterialIcon name="close" />
+            </button>
+            <div className="mb-6 mt-2">
+              <h3 className="text-xl font-black text-clinical-blue flex items-center gap-2">
+                <MaterialIcon name="event_available" />
+                Gestionar mi cita
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Día reservado</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  {diasSemana[selectedManagedBooking.dayIndex].label} {diasSemana[selectedManagedBooking.dayIndex].num}
+                </p>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Hora</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  {selectedManagedBooking.time}
+                </p>
+              </div>
+            </div>
+            <div className="p-3 mb-6 rounded-xl bg-clinical-blue/10 border border-clinical-blue/20 text-clinical-blue">
+              <p className="text-[10px] font-bold uppercase">Consultorio</p>
+              <p className="text-sm font-black">{selectedManagedBooking.consultorio}</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelManagedBooking}
+                className="flex-1 py-3 bg-danger-red text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all cursor-pointer"
+              >
+                Cancelar cita
+              </button>
+              <button
+                onClick={startReschedule}
+                className="flex-1 py-3 bg-clinical-blue text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-all cursor-pointer"
+              >
+                Reagendar
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+     <Modal isOpen={isModalConfirm} onClose={handleCloseModal}>
+             <div className="text-center">
+               <div className="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                 <MaterialIcon name="check_circle" className="text-4xl" />
+               </div>
+               <h4 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">
+                 ¡Acción completada!
+               </h4>
+               <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">{feedbackMessage}</p>
+               <button
+                 onClick={handleCloseModal}
+                 className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-bold py-3.5 rounded-2xl hover:opacity-90 transition-all shadow-lg cursor-pointer"
+               >
+                 Entendido
+               </button>
+             </div>
+           </Modal>
     </div>
   );
 }
