@@ -24,6 +24,7 @@ export default function PriorityBadge({ label, variant }: PriorityBadgeProps) {
     norm === "confirmada" ||
     norm === "confirmado" ||
     norm === "activo" ||
+    norm === "disponible" ||
     norm === "completado" ||
     norm === "emerald" ||
     norm === "success" ||
